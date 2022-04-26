@@ -1,10 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -118,6 +115,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
      * 批量删除字典类型
      * 
      * @param ids 需要删除的数据
+     * @return 结果
      */
     @Override
     public void deleteDictTypeByIds(String ids)
@@ -138,22 +136,19 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     /**
      * 加载字典缓存数据
      */
-    @Override
     public void loadingDictCache()
     {
-        SysDictData dictData = new SysDictData();
-        dictData.setStatus("0");
-        Map<String, List<SysDictData>> dictDataMap = dictDataMapper.selectDictDataList(dictData).stream().collect(Collectors.groupingBy(SysDictData::getDictType));
-        for (Map.Entry<String, List<SysDictData>> entry : dictDataMap.entrySet())
+        List<SysDictType> dictTypeList = dictTypeMapper.selectDictTypeAll();
+        for (SysDictType dict : dictTypeList)
         {
-            DictUtils.setDictCache(entry.getKey(), entry.getValue().stream().sorted(Comparator.comparing(SysDictData::getDictSort)).collect(Collectors.toList()));
+            List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dict.getDictType());
+            DictUtils.setDictCache(dict.getDictType(), dictDatas);
         }
     }
 
     /**
      * 清空字典缓存数据
      */
-    @Override
     public void clearDictCache()
     {
         DictUtils.clearDictCache();
@@ -162,7 +157,6 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     /**
      * 重置字典缓存数据
      */
-    @Override
     public void resetDictCache()
     {
         clearDictCache();
