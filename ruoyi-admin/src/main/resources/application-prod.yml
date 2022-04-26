@@ -47,7 +47,9 @@ user:
 # Spring配置
 spring:
   config:
-    import: classpath:application-druid.yml
+    import:
+      - classpath:properties/prod-druid.yml
+      - classpath:properties/prod-cache.yml
   # 模板引擎
   thymeleaf:
     mode: HTML
