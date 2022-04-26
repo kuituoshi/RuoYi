@@ -42,4 +42,5 @@ public class RedisConfig extends CachingConfigurerSupport
         template.afterPropertiesSet();
         return template;
     }
+
 }
