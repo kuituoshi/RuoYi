@@ -1,3 +1,9 @@
+// 加密
+function encrypt(txt) {
+    const encryptor = new JSEncrypt()
+    encryptor.setPublicKey(globalRSAPublicKey) // 设置公钥
+    return encryptor.encrypt(txt) // 对数据进行加密
+}
 
 $(function() {
     validateKickout();
@@ -26,7 +32,7 @@ function login() {
         url: ctx + "login",
         data: {
             "username": username,
-            "password": password,
+            "password": encrypt(password),
             "validateCode": validateCode,
             "rememberMe": rememberMe,
             "verificationCode": verificationCode
