@@ -3,7 +3,10 @@ package com.ruoyi.web.controller.system;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.common.constant.ConfigKeyConstants;
 import com.ruoyi.common.core.domain.MyResult;
+import com.ruoyi.common.utils.security.RSAUtils;
+import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -22,6 +25,8 @@ import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.web.service.ConfigService;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * 登录验证
@@ -42,6 +47,9 @@ public class SysLoginController extends BaseController
 
     @Autowired
     private ISysUserService sysUserService;
+
+    @Autowired
+    private ISysConfigService sysConfigService;
 
     @GetMapping("/login")
     public String login(HttpServletRequest request, HttpServletResponse response, ModelMap mmap)
@@ -68,14 +76,17 @@ public class SysLoginController extends BaseController
         {
             return error(myResult.getMessage());
         }
-        UsernamePasswordToken token = new UsernamePasswordToken(username, password, rememberMe);
-        Subject subject = SecurityUtils.getSubject();
+
         try
         {
+            String plainPassword = RSAUtils.decrypt(sysConfigService.selectConfigByKey(ConfigKeyConstants.GLOBAL_RSA_PRIVATE_KEY),
+                    password, StandardCharsets.UTF_8);
+            UsernamePasswordToken token = new UsernamePasswordToken(username, plainPassword, rememberMe);
+            Subject subject = SecurityUtils.getSubject();
             subject.login(token);
             return success();
         }
-        catch (AuthenticationException e)
+        catch (Exception e)
         {
             String msg = "用户或密码错误";
             if (StringUtils.isNotEmpty(e.getMessage()))
