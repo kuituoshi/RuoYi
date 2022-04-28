@@ -99,7 +99,10 @@
                 },
                 {
                     field: 'configValue',
-                    title: '参数键值'
+                    title: '参数键值',
+					formatter: function(value, row, index) {
+						return $.table.tooltip(value);
+					}
                 },
                 {
                     field: 'configType',

@@ -40,12 +40,33 @@
 	<script th:src="@{/ruoyi/js/ry-ui.js?v=4.7.3}"></script>
 </div>
 
+<!-- mfa输入框 -->
+<div th:fragment="mfa-input">
+	<input th:if="${@config.getKey('global.mfa.isOpen')=='true'}" type="number" name="verificationCode" class="form-control pword" placeholder="MFA动态码">
+</div>
+
+<div th:fragment="mfa-form-group">
+	<div th:if="${@config.getKey('global.mfa.isOpen')=='true'}" class="form-group">
+		<label class="col-sm-3 control-label">MFA验证码：</label>
+		<div class="col-sm-8">
+			<input name="verificationCode" class="form-control" style="background: aliceblue;" type="number" placeholder="如果绑定请输入Google验证码">
+		</div>
+	</div>
+</div>
+
+
+
 <!-- ztree树插件 -->
 <div th:fragment="ztree-css">
     <link th:href="@{/ajax/libs/jquery-ztree/3.5/css/metro/zTreeStyle.css}" rel="stylesheet"/>
 </div>
 <div th:fragment="ztree-js">
     <script th:src="@{/ajax/libs/jquery-ztree/3.5/js/jquery.ztree.all-3.5.js}"></script>
+</div>
+
+<!-- qrcode插件 -->
+<div th:fragment="qrcode-js">
+	<script th:src="@{/js/qrcode.min.js}"></script>
 </div>
 
 <!-- select2下拉框插件 -->

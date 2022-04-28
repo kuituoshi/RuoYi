@@ -2,8 +2,16 @@ package com.ruoyi.system.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.validation.Validator;
+
+import com.ruoyi.common.constant.ConfigKeyConstants;
+import com.ruoyi.common.constant.Constants;
+import com.ruoyi.common.constant.RedisKeyConstants;
+import com.ruoyi.common.core.domain.MyResult;
+import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.common.utils.GoogleAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +70,9 @@ public class SysUserServiceImpl implements ISysUserService
 
     @Autowired
     protected Validator validator;
+
+    @Autowired
+    private RedisCache redisCache;
 
     /**
      * 根据条件分页查询用户列表
@@ -547,4 +558,108 @@ public class SysUserServiceImpl implements ISysUserService
     {
         return userMapper.updateUser(user);
     }
+
+    /**
+     * 创建用户MFA，返回MFA链接
+     * @param user 用户信息
+     * @return 结果
+     */
+    @Override
+    public String createMFA(SysUser user){
+        String secretKey = GoogleAuthenticator.generateSecretKey();
+        // 缓存5分钟密钥，用于保存时校验
+        redisCache.setCacheObject(RedisKeyConstants.USER_TEMP_MFA_SECRET + user.getUserId(), secretKey, 5, TimeUnit.MINUTES);
+        return GoogleAuthenticator.makeOtpURL(user.getLoginName(), Constants.SYS_NAME, secretKey);
+    }
+
+    /**
+     * 保存MFA
+     * @param user
+     * @param verificationCode
+     * @return
+     */
+    @Override
+    public boolean saveMFA(SysUser user, String verificationCode)
+    {
+        String cacheSecret = redisCache.getCacheObject(RedisKeyConstants.USER_TEMP_MFA_SECRET + user.getUserId());
+        if (StringUtils.isEmpty(cacheSecret))
+        {
+            throw new ServiceException("该二维码已过期，请重新生成后绑定");
+        }
+
+        boolean b = GoogleAuthenticator.authCode(verificationCode, cacheSecret);
+        if (!b)
+            return false;
+
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(user.getUserId());
+        sysUser.setMfa(cacheSecret);
+        userMapper.updateUser(sysUser);
+
+        return true;
+    }
+
+    /**
+     * 清空MFA
+     * @param user 用户对象
+     * @param verificationCode 接受到的验证码
+     * @return
+     */
+    @Override
+    public boolean cleanMFA(SysUser user, String verificationCode)
+    {
+        if (StringUtils.isEmpty(user.getMfa()))
+        {
+            return true;
+        }
+
+        boolean b = GoogleAuthenticator.authCode(verificationCode, user.getMfa());
+        if (!b)
+            return false;
+
+        SysUser sysUser = new SysUser();
+        sysUser.setUserId(user.getUserId());
+        sysUser.setMfa("");
+        userMapper.updateUser(sysUser);
+
+        return true;
+    }
+
+    /**
+     * 登录验证MFA
+     * @param username 登录用户名
+     * @param verificationCode 登录验证码
+     * @return MyResult
+     */
+    @Override
+    public MyResult<?> loginCheckMFA(String username, String verificationCode)
+    {
+        SysUser user = selectUserByLoginName(username);
+        if (user == null)
+        {
+            return MyResult.error("用户验证失败！");
+        }
+        if (StringUtils.isEmpty(user.getMfa()))
+        {
+            return MyResult.success("通过");
+        }
+        // 全局开关关闭时，不需要验证
+        String mfaSwitch = configService.selectConfigByKey(ConfigKeyConstants.GLOBAL_MFA_SWITCH);
+        if (Constants.SYS_CONFIG_GLOBAL_SWITCH_CLOSE.equals(mfaSwitch))
+        {
+            return MyResult.success("通过");
+        }
+        if (StringUtils.isEmpty(verificationCode))
+        {
+            return MyResult.error("请输入二次验证码");
+        }
+
+        boolean b = GoogleAuthenticator.authCode(verificationCode, user.getMfa());
+        if (!b){
+            log.error("用户：{} MFA校验失败！", username);
+            return MyResult.error("验证码校验失败");
+        }
+        return MyResult.success("通过");
+    }
+
 }

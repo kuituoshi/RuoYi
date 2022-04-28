@@ -8,6 +8,11 @@ package com.ruoyi.common.constant;
 public class Constants
 {
     /**
+     * 系统名称，不能用中文，会导致生成MFA链接失效
+     */
+    public static final String SYS_NAME = "RuoYi";
+
+    /**
      * UTF-8 字符集
      */
     public static final String UTF8 = "UTF-8";
@@ -112,4 +117,14 @@ public class Constants
      */
     public static final String[] JOB_ERROR_STR = { "java.net.URL", "javax.naming.InitialContext", "org.yaml.snakeyaml",
             "org.springframework", "org.apache", "com.ruoyi.common.utils.file" };
+
+    /**
+     * 系统全局参数开关：开启
+     */
+    public static final String SYS_CONFIG_GLOBAL_SWITCH_OPEN = "true";
+
+    /**
+     * 系统全局参数开关：关闭
+     */
+    public static final String SYS_CONFIG_GLOBAL_SWITCH_CLOSE = "false";
 }

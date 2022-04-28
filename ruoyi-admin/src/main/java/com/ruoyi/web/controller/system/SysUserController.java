@@ -2,6 +2,8 @@ package com.ruoyi.web.controller.system;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.ruoyi.common.utils.GoogleAuthenticator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -298,5 +300,56 @@ public class SysUserController extends BaseController
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
         return toAjax(userService.changeStatus(user));
+    }
+
+    /**
+     * 创建谷歌验证码，如果已经存在则返回warn
+     */
+    @PostMapping("/createMFA")
+    @ResponseBody
+    public AjaxResult createMFA()
+    {
+        SysUser sysUser = ShiroUtils.getSysUser();
+        if (StringUtils.isEmpty(sysUser.getMfa()))
+        {
+            return success((Object) userService.createMFA(sysUser));
+        }
+        return AjaxResult.warn("用户MFA已绑定过了");
+    }
+
+    /**
+     * 保存谷歌验证码
+     */
+    @Log(title = "MFA保存", businessType = BusinessType.UPDATE)
+    @PostMapping("/saveMFA")
+    @ResponseBody
+    public AjaxResult saveMFA(String verificationCode)
+    {
+        SysUser sysUser = ShiroUtils.getSysUser();
+        boolean b = userService.saveMFA(sysUser, verificationCode);
+        if (b){
+            setSysUser(userService.selectUserById(sysUser.getUserId()));
+            return success("绑定成功");
+        }else{
+            return error("验证码比对失败");
+        }
+    }
+
+    /**
+     * 清空谷歌验证码
+     */
+    @Log(title = "MFA清空", businessType = BusinessType.CLEAN)
+    @PostMapping("/cleanMFA")
+    @ResponseBody
+    public AjaxResult cleanMFA(String verificationCode)
+    {
+        SysUser sysUser = ShiroUtils.getSysUser();
+        boolean b = userService.cleanMFA(sysUser, verificationCode);
+        if (b){
+            setSysUser(userService.selectUserById(sysUser.getUserId()));
+            return success("MFA已清空");
+        }else{
+            return error("验证码比对失败");
+        }
     }
 }

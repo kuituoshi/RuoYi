@@ -86,6 +86,9 @@ public class SysUser extends BaseEntity
     /** 密码最后更新时间 */
     private Date pwdUpdateDate;
 
+    /** 多因素谷歌认证码 */
+    private String mfa;
+
     /** 部门对象 */
     @Excels({
         @Excel(name = "部门名称", targetAttr = "deptName", type = Type.EXPORT),
@@ -352,6 +355,14 @@ public class SysUser extends BaseEntity
     public void setPostIds(Long[] postIds)
     {
         this.postIds = postIds;
+    }
+
+    public String getMfa() {
+        return mfa;
+    }
+
+    public void setMfa(String mfa) {
+        this.mfa = mfa;
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.ruoyi.system.service;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.MyResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.system.domain.SysUserRole;
 
@@ -211,4 +213,35 @@ public interface ISysUserService
      * @return 结果
      */
     public int changeStatus(SysUser user);
+
+    /**
+     * 创建用户MFA，返回MFA链接
+     * @param user 用户信息
+     * @return 结果
+     */
+    public String createMFA(SysUser user);
+
+    /**
+     * 保存MFA
+     * @param user
+     * @param verificationCode
+     * @return
+     */
+    public boolean saveMFA(SysUser user, String verificationCode);
+
+    /**
+     * 清空MFA
+     * @param user 用户对象
+     * @param verificationCode 接受到的验证码
+     * @return
+     */
+    public boolean cleanMFA(SysUser user, String verificationCode);
+
+    /**
+     * 登录验证MFA
+     * @param username 登录用户名
+     * @param verificationCode 登录验证码
+     * @return MyResult
+     */
+    public MyResult<?> loginCheckMFA(String username, String verificationCode);
 }

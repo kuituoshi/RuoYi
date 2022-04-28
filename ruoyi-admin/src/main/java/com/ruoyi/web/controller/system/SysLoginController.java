@@ -2,6 +2,9 @@ package com.ruoyi.web.controller.system;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.common.core.domain.MyResult;
+import com.ruoyi.system.service.ISysUserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -37,6 +40,9 @@ public class SysLoginController extends BaseController
     @Autowired
     private ConfigService configService;
 
+    @Autowired
+    private ISysUserService sysUserService;
+
     @GetMapping("/login")
     public String login(HttpServletRequest request, HttpServletResponse response, ModelMap mmap)
     {
@@ -54,8 +60,14 @@ public class SysLoginController extends BaseController
 
     @PostMapping("/login")
     @ResponseBody
-    public AjaxResult ajaxLogin(String username, String password, Boolean rememberMe)
+    public AjaxResult ajaxLogin(String username, String password, Boolean rememberMe, String verificationCode)
     {
+        // 验证MFA
+        MyResult<?> myResult = sysUserService.loginCheckMFA(username, verificationCode);
+        if (myResult.isError())
+        {
+            return error(myResult.getMessage());
+        }
         UsernamePasswordToken token = new UsernamePasswordToken(username, password, rememberMe);
         Subject subject = SecurityUtils.getSubject();
         try
