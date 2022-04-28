@@ -2,6 +2,8 @@ package com.ruoyi.web.controller.system;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.ruoyi.common.utils.GoogleAuthenticator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,6 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.Ztree;
-import com.ruoyi.common.core.domain.entity.SysDept;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -30,7 +30,6 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.shiro.service.SysPasswordService;
 import com.ruoyi.framework.shiro.util.AuthorizationUtils;
-import com.ruoyi.system.service.ISysDeptService;
 import com.ruoyi.system.service.ISysPostService;
 import com.ruoyi.system.service.ISysRoleService;
 import com.ruoyi.system.service.ISysUserService;
@@ -51,9 +50,6 @@ public class SysUserController extends BaseController
 
     @Autowired
     private ISysRoleService roleService;
-    
-    @Autowired
-    private ISysDeptService deptService;
 
     @Autowired
     private ISysPostService postService;
@@ -307,27 +303,53 @@ public class SysUserController extends BaseController
     }
 
     /**
-     * 加载部门列表树
+     * 创建谷歌验证码，如果已经存在则返回warn
      */
-    @RequiresPermissions("system:user:list")
-    @GetMapping("/deptTreeData")
+    @PostMapping("/createMFA")
     @ResponseBody
-    public List<Ztree> deptTreeData()
+    public AjaxResult createMFA()
     {
-        List<Ztree> ztrees = deptService.selectDeptTree(new SysDept());
-        return ztrees;
+        SysUser sysUser = ShiroUtils.getSysUser();
+        if (StringUtils.isEmpty(sysUser.getMfa()))
+        {
+            return success((Object) userService.createMFA(sysUser));
+        }
+        return AjaxResult.warn("用户MFA已绑定过了");
     }
 
     /**
-     * 选择部门树
-     * 
-     * @param deptId 部门ID
+     * 保存谷歌验证码
      */
-    @RequiresPermissions("system:user:list")
-    @GetMapping("/selectDeptTree/{deptId}")
-    public String selectDeptTree(@PathVariable("deptId") Long deptId, ModelMap mmap)
+    @Log(title = "MFA保存", businessType = BusinessType.UPDATE)
+    @PostMapping("/saveMFA")
+    @ResponseBody
+    public AjaxResult saveMFA(String verificationCode)
     {
-        mmap.put("dept", deptService.selectDeptById(deptId));
-        return prefix + "/deptTree";
+        SysUser sysUser = ShiroUtils.getSysUser();
+        boolean b = userService.saveMFA(sysUser, verificationCode);
+        if (b){
+            setSysUser(userService.selectUserById(sysUser.getUserId()));
+            return success("绑定成功");
+        }else{
+            return error("验证码比对失败");
+        }
+    }
+
+    /**
+     * 清空谷歌验证码
+     */
+    @Log(title = "MFA清空", businessType = BusinessType.CLEAN)
+    @PostMapping("/cleanMFA")
+    @ResponseBody
+    public AjaxResult cleanMFA(String verificationCode)
+    {
+        SysUser sysUser = ShiroUtils.getSysUser();
+        boolean b = userService.cleanMFA(sysUser, verificationCode);
+        if (b){
+            setSysUser(userService.selectUserById(sysUser.getUserId()));
+            return success("MFA已清空");
+        }else{
+            return error("验证码比对失败");
+        }
     }
 }
