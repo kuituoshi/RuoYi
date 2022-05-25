@@ -1,0 +1,21 @@
+#rocketmq配置
+rocketmq:
+    name-server: 127.0.0.1:9876
+    # 消费者配置
+    consumer:
+        # 默认消费组
+        group: default-consumer-group
+    # 生产者配置
+    producer:
+        isOnOff: on
+        nameSrvAddr: 127.0.0.1:9876
+        group: default-producer-group
+        # 服务地址
+        namesrvAddr: 127.0.0.1:9876
+        # 消息最大长度 默认1024*4(4M)
+        maxMessageSize: 4096
+        # 发送消息超时时间,默认3000
+        sendMsgTimeout: 3000
+        # 发送消息失败重试次数，默认2
+        retryTimesWhenSendFailed: 2
+

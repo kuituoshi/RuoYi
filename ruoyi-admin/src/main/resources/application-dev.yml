@@ -50,6 +50,7 @@ spring:
     import:
       - classpath:properties/dev-druid.yml
       - classpath:properties/dev-cache.yml
+      - classpath:properties/dev-mq.yml
   # 模板引擎
   thymeleaf:
     mode: HTML
