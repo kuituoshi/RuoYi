@@ -1,14 +1,10 @@
 package com.ruoyi.common.core.domain;
 
-import java.io.Serializable;
-
 /**
  * 通用返回的结果类
  * @param <T>
  */
-public class MyResult<T> implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class MyResult<T> {
     private Integer state;
     private String message;
     private T data;
