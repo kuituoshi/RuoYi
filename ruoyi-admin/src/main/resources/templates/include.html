@@ -7,19 +7,19 @@
 	<meta name="description" content="">
 	<title th:text="${title}"></title>
 	<link th:href="@{/css/bootstrap.min.css?v=3.3.7}" rel="stylesheet"/>
-	<link th:href="@{/css/font-awesome.min.css?v=4.7.3}" rel="stylesheet"/>
+	<link th:href="@{/css/font-awesome.min.css?v=4.7.0}" rel="stylesheet"/>
 	<!-- bootstrap-table 表格插件样式 -->
 	<link th:href="@{/ajax/libs/bootstrap-table/bootstrap-table.min.css?v=1.18.3}" rel="stylesheet"/>
 	<link th:href="@{/css/animate.min.css?v=20210831}" rel="stylesheet"/>
 	<link th:href="@{/css/style.min.css?v=20210831}" rel="stylesheet"/>
-	<link th:href="@{/ruoyi/css/ry-ui.css?v=4.7.3}" rel="stylesheet"/>
+	<link th:href="@{/ruoyi/css/ry-ui.css?v=4.7.5}" rel="stylesheet"/>
 </head>
 
 <!-- 通用JS -->
 <div th:fragment="footer">
     <script th:inline="javascript"> var ctx = [[@{/}]]; var lockscreen = [[${session.lockscreen}]]; if(lockscreen){window.top.location=ctx+"lockscreen";} </script>
     <a id="scroll-up" href="#" class="btn btn-sm display"><i class="fa fa-angle-double-up"></i></a>
-	<script th:src="@{/js/jquery.min.js?v=3.6.0}"></script>
+	<script th:src="@{/js/jquery.min.js?v=3.6.1}"></script>
 	<script th:src="@{/js/bootstrap.min.js?v=3.3.7}"></script>
 	<!-- bootstrap-table 表格插件 -->
 	<script th:src="@{/ajax/libs/bootstrap-table/bootstrap-table.min.js?v=1.18.3}"></script>
@@ -35,26 +35,10 @@
 	<script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js?v=2.70.0}"></script>
     <script th:src="@{/ajax/libs/iCheck/icheck.min.js?v=1.0.3}"></script>
 	<script th:src="@{/ajax/libs/layer/layer.min.js?v=3.5.1}"></script>
-	<script th:src="@{/ajax/libs/layui/layui.min.js?v=2.6.8}"></script>
-	<script th:src="@{/ruoyi/js/common.js?v=4.7.3}"></script>
-	<script th:src="@{/ruoyi/js/ry-ui.js?v=4.7.3}"></script>
+	<script th:src="@{/ajax/libs/layui/layui.min.js?v=2.7.5}"></script>
+	<script th:src="@{/ruoyi/js/common.js?v=4.7.5}"></script>
+	<script th:src="@{/ruoyi/js/ry-ui.js?v=4.7.5}"></script>
 </div>
-
-<!-- mfa输入框 -->
-<div th:fragment="mfa-input">
-	<input th:if="${@config.getKey('global.mfa.isOpen')=='true'}" type="number" name="verificationCode" class="form-control pword" placeholder="MFA动态码">
-</div>
-
-<div th:fragment="mfa-form-group">
-	<div th:if="${@config.getKey('global.mfa.isOpen')=='true'}" class="form-group">
-		<label class="col-sm-3 control-label">MFA验证码：</label>
-		<div class="col-sm-8">
-			<input name="verificationCode" class="form-control" style="background: aliceblue;" type="number" placeholder="如果绑定请输入Google验证码">
-		</div>
-	</div>
-</div>
-
-
 
 <!-- ztree树插件 -->
 <div th:fragment="ztree-css">
@@ -62,11 +46,6 @@
 </div>
 <div th:fragment="ztree-js">
     <script th:src="@{/ajax/libs/jquery-ztree/3.5/js/jquery.ztree.all-3.5.js}"></script>
-</div>
-
-<!-- qrcode插件 -->
-<div th:fragment="qrcode-js">
-	<script th:src="@{/js/qrcode.min.js}"></script>
 </div>
 
 <!-- select2下拉框插件 -->

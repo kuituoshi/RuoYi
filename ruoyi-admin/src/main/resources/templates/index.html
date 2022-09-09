@@ -14,7 +14,7 @@
     <link th:href="@{/css/animate.min.css}" rel="stylesheet"/>
     <link th:href="@{/css/style.min.css}" rel="stylesheet"/>
     <link th:href="@{/css/skins.css}" rel="stylesheet"/>
-    <link th:href="@{/ruoyi/css/ry-ui.css?v=4.7.3}" rel="stylesheet"/>
+    <link th:href="@{/ruoyi/css/ry-ui.css?v=4.7.5}" rel="stylesheet"/>
 </head>
 <body class="fixed-sidebar full-height-layout gray-bg" th:classappend="${isMobile} ? 'canvas-menu'" style="overflow: hidden">
 <div id="wrapper">
@@ -80,6 +80,7 @@
 								<li><a class="menuItem" th:href="@{/demo/form/grid}">栅格</a></li>
 								<li><a class="menuItem" th:href="@{/demo/form/select}">下拉框</a></li>
 								<li><a class="menuItem" th:href="@{/demo/form/timeline}">时间轴</a></li>
+								<li><a class="menuItem" th:href="@{/demo/form/progress_bars}">进度条</a></li>
 								<li><a class="menuItem" th:href="@{/demo/form/basic}">基本表单</a></li>
 								<li><a class="menuItem" th:href="@{/demo/form/cards}">卡片列表</a></li>
 								<li><a class="menuItem" th:href="@{/demo/form/jasny}">功能扩展</a></li>
@@ -192,6 +193,7 @@
                     </a>
                 </div>
                 <ul class="nav navbar-top-links navbar-right welcome-message">
+                    <li><a data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="开发文档" href="http://doc.ruoyi.vip/ruoyi" target="_blank"><i class="fa fa-question-circle"></i> 文档</a></li>
                     <li><a data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="锁定屏幕" href="#" id="lockScreen"><i class="fa fa-lock"></i> 锁屏</a></li>
 	                <li><a data-toggle="tooltip" data-trigger="hover" data-placement="bottom" title="全屏显示" href="#" id="fullScreen"><i class="fa fa-arrows-alt"></i> 全屏</a></li>
                     <li class="dropdown user-menu">
@@ -208,14 +210,14 @@
 								<a onclick="resetPwd()">
 								<i class="fa fa-key"></i> 修改密码</a>
 							</li>
-<!--							<li>-->
-<!--								<a onclick="switchSkin()">-->
-<!--								<i class="fa fa-dashboard"></i> 切换主题</a>-->
-<!--							</li>-->
-<!--							<li>-->
-<!--								<a onclick="toggleMenu()">-->
-<!--								<i class="fa fa-toggle-off"></i> 横向菜单</a>-->
-<!--							</li>-->
+							<li>
+								<a onclick="switchSkin()">
+								<i class="fa fa-dashboard"></i> 切换主题</a>
+							</li>
+							<li>
+								<a onclick="toggleMenu()">
+								<i class="fa fa-toggle-off"></i> 横向菜单</a>
+							</li>
 							<li class="divider"></li>
 							<li>
 								<a th:href="@{logout}">
@@ -262,8 +264,8 @@
 <script th:src="@{/js/jquery.contextMenu.min.js}"></script>
 <script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
 <script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
-<script th:src="@{/ruoyi/js/ry-ui.js?v=4.7.3}"></script>
-<script th:src="@{/ruoyi/js/common.js?v=4.7.3}"></script>
+<script th:src="@{/ruoyi/js/ry-ui.js?v=4.7.5}"></script>
+<script th:src="@{/ruoyi/js/common.js?v=4.7.5}"></script>
 <script th:src="@{/ruoyi/index.js?v=20201208}"></script>
 <script th:src="@{/ajax/libs/fullscreen/jquery.fullscreen.js}"></script>
 <script th:inline="javascript">
