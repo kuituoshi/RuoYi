@@ -4,13 +4,16 @@ import java.util.Date;
 import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.common.constant.ConfigKeyConstants;
+import com.ruoyi.common.utils.security.Md5Utils;
+import com.ruoyi.system.service.ISysUserService;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.constant.ShiroConstants;
 import com.ruoyi.common.core.controller.BaseController;
@@ -42,6 +45,12 @@ public class SysIndexController extends BaseController
 
     @Autowired
     private SysPasswordService passwordService;
+
+    @Autowired
+    private ISysUserService sysUserService;
+
+    @Autowired
+    private ISysConfigService sysConfigService;
 
     // 系统首页
     @GetMapping("/index")
@@ -132,6 +141,24 @@ public class SysIndexController extends BaseController
     {
         mmap.put("version", RuoYiConfig.getVersion());
         return "main";
+    }
+
+    @ResponseBody
+    @GetMapping("/health_check")
+    public ResponseEntity<String> loginCheck(String username, String password)
+    {
+        try {
+            sysConfigService.selectConfigByKey(ConfigKeyConstants.GLOBAL_MFA_SWITCH);
+            SysUser user = sysUserService.selectUserByLoginName(username);
+            if (user == null || !user.getPassword().equals(passwordService.encryptPassword(username, password, user.getSalt()))){
+                return ResponseEntity.status(403).body("认证失败");
+            }
+            return ResponseEntity.status(200).body("系统运行正常");
+        }catch (Exception e)
+        {
+            return ResponseEntity.status(500).body("系统异常");
+        }
+
     }
 
     // content-main class
